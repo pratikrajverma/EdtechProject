@@ -20,7 +20,7 @@ const resetPasswordToken = async (req, res) => {
 
         const url = `https://localhost:3000/update-password/${token}`;
 
-        await mailSender(email, "reset your password by link", `reset link${url}`);
+        await mailSender(email, "reset your password by link", `reset link ${url}`);
 
         return res.status(200).json({
             success: true,

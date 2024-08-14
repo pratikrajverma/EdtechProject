@@ -12,6 +12,10 @@ const sendOtp = async (req, res) => {
     try {
         const { email } = req.email;
 
+        if(!email){
+            return res.status(400).json({ message: "Email is required for otp creation" });
+        }
+
         const checkUserpresent = User.findOne({ email: email });
 
         if (checkUserpresent) {
@@ -21,7 +25,7 @@ const sendOtp = async (req, res) => {
             });
         }
 
-        //generate
+        //generate otp
 
         var otp = otpGenerator.generate(6, {
             upperCaseAlphabets: false,
@@ -48,18 +52,18 @@ const sendOtp = async (req, res) => {
 
         console.log("otp generated", otp);
 
-        //send otp to database
-        const otpPayload = { email, otp };
+     
 
-        const response = await Otp.create(otpPayload);
+        const response = await Otp.create({ email, otp });
 
         console.log("otp sended to data base response", response);
 
         res.status(200).json({
             success: true,
             message: "OTP sent successfully",
-            otp,
+            response
         });
+
     } catch (error) {
         console.log("failed to create otp");
         res.status(500).json({
@@ -118,9 +122,9 @@ const signup = async (req, res) => {
             .sort({ createdAt: -1 })
             .limit(1);
 
-        const recentOtp = recentOtpDocument ? recentOtpDocument.otp : null;
+        const recentOtp = recentOtpDocument ? recentOtpDocument.otp : 0;
 
-        if (recentOtp.length === 0) {
+        if (recentOtp === 0) {
             return res.status(403).json({
                 success: false,
                 message: "No otp found",
@@ -131,6 +135,7 @@ const signup = async (req, res) => {
                 message: "Invalid OTP",
             });
         }
+
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -157,6 +162,7 @@ const signup = async (req, res) => {
             message: "Account created successfully",
             user,
         });
+
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -231,7 +237,7 @@ const changePassword = async (req, res) => {
         if (!oldpassword || !newpassword || !confirmPassword) {
             return res.status(403).json({
                 success: false,
-                message: "All fields are required for reset password",
+                message: "All fields are required for change password",
             });
         }
 

@@ -28,9 +28,9 @@ const courseSchema = new mongoose.Schema({
     thumbnail:{
         type:String,
     },
-    tag:{
+    category:{
         type:mongoose.Types.Schema.ObjectId,
-        ref: 'Tag'
+        ref: 'Category'
     },
     studentEnrolled:[{
         type: mongoose.Types.Schema.ObjectId,
